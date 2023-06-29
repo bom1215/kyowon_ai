@@ -59,7 +59,7 @@ def make_blank(sentence):
     :return: 빈칸이 생긴 문장
     '''
     input_text = f'\'{sentence}\'  문장을\nsentence: 한 단어를 @으로 대체한 문장\nword: 대체된 단어\n형식으로 출력해줘'
-    print(input_text)
+
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
