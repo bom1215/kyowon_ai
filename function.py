@@ -8,8 +8,12 @@ openai.api_key = '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'
 os.environ['_BARD_API_KEY'] = "YAhNS1UWSLEy0sY5PiorpmKA1qJlAuVaUTrefhcM3tivexEDgpKesbpu17SKf4RzenC9IA."
 
 
-def isKoreanIncluded(word):
-    for i in word:
+def isKoreanIncluded(sentence):
+    '''
+    :param word: 문장
+    :return: 문장에 한글이 포함되어 있으면 True, 포함되어 있지 않으면 False
+    '''
+    for i in sentence:
         if int('0x1100', 16) < ord(i) < int('0x11ff', 16):
             return True
         if int('0x3131', 16) < ord(i) < int('0x318e', 16):
@@ -39,9 +43,9 @@ def make_sentence(keyword):
             response = bardapi.core.Bard().get_answer(input_text)
             sentence = response['choices'][0]['content'][0].split('$')[1]
         except:
-            print(response)
             print('bard 문장 생성 오류')
         else:
+            # 문장이 한글 대신 다른 언어로 작성된 경우 다시 생성
             if isKoreanIncluded(sentence):
                 break
             else:
