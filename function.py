@@ -58,14 +58,15 @@ def make_blank(sentence):
     :param sentence: 빈칸을 만들 문장
     :return: 빈칸이 생긴 문장
     '''
-    input_text = f'\'{sentence}\'  문장을\nsentence: 한 단어를 @으로 대체한 문장\nword: 대체된 단어\n형식으로 출력해줘'
+    input_text = f'\'{sentence}\' 문장에서 단어 1개를 ___으로 대체해서 출력하고 ___ 자리에 있던 단어를 출력해 줘'
 
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
+            {"role": "system", "content": "'단어 1개를 ___으로 대체한 문장':'___ 자리에 있던 단어' 형식으로 출력해줘"},
             {"role": "user", "content": input_text}
         ]
     )
-
-    print(response.choices[0].message.content)
-    return response.choices[0].message.content
+    sentence, word = response.choices[0].message.content.split(':')[:2]
+    sentence, word = sentence.strip(), word.strip()
+    return sentence[1:-1], word[1:-1]
