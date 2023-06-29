@@ -60,13 +60,24 @@ def make_blank(sentence):
     '''
     input_text = f'\'{sentence}\' 문장에서 단어 1개를 ___으로 대체해서 출력하고 ___ 자리에 있던 단어를 출력해 줘'
 
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": "'단어 1개를 ___으로 대체한 문장':'___ 자리에 있던 단어' 형식으로 출력해줘"},
-            {"role": "user", "content": input_text}
-        ]
-    )
-    sentence, word = response.choices[0].message.content.split(':')[:2]
-    sentence, word = sentence.strip(), word.strip()
-    return sentence[1:-1], word[1:-1]
+    while True:
+        # gpt에서 제대로된 답변을 했는지 확인
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "문장에서 단어 1개를 ___으로 대체해서 출력하고 ___ 자리에 있던 단어를 출력해달라는 요청을 받으면 반드시 '단어 1개를 ___으로 대체한 문장':'___ 자리에 있던 단어' 형식으로 출력해줘"},
+                {"role": "user", "content": '\'우주에는 수없이 많은 별이 빛나고 있습니다.\' 문장에서 단어 1개를 ___으로 대체해서 출력하고 ___ 자리에 있던 단어를 출력해 줘'},
+                {"role": "assistant", "content": '우주에는 수없이 많은 ___이 빛나고 있습니다.\':\'별\''},
+                {"role": "user", "content": '\'천문학자는 별을 보지 않는다\' 문장에서 단어 1개를 ___으로 대체해서 출력하고 ___ 자리에 있던 단어를 출력해 줘'},
+                {"role": "assistant", "content": '___는 별을 보지 않는다\':\'천문학자\''},
+                {"role": "user", "content": '\'그래도 좋은 날이 앞으로 많기를\' 문장에서 단어 1개를 ___으로 대체해서 출력하고 ___ 자리에 있던 단어를 출력해 줘'},
+                {"role": "assistant", "content": '그래도 ___ 날이 앞으로 많기를\':\'좋은\''},
+                {"role": "user", "content": input_text}
+            ]
+        )
+        generated_sentence, word = response.choices[0].message.content.split(':')[:2]
+        generated_sentence, word = generated_sentence.strip(), word.strip()
+        generated_sentence, word = re.sub('\'', '', generated_sentence), re.sub('\'', '', word)
+        if re.sub('___', word, generated_sentence) == sentence:
+            break
+    return generated_sentence, word
