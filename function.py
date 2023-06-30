@@ -2,10 +2,11 @@ import bardapi
 import os
 import openai
 import re
+import random
 
 # api key setting
 openai.api_key = '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'
-os.environ['_BARD_API_KEY'] = "YAhNS1UWSLEy0sY5PiorpmKA1qJlAuVaUTrefhcM3tivexEDgpKesbpu17SKf4RzenC9IA."
+os.environ['_BARD_API_KEY'] = "YQhNS9UR3VNnVtRLmRTy6A2XCY7YBpSx70lPTldi-1te9g2l3jrMJ1xHFOrOjYoGLdQgig."
 
 
 def isKoreanIncluded(sentence):
@@ -80,4 +81,35 @@ def make_blank(sentence):
         generated_sentence, word = re.sub('\'', '', generated_sentence), re.sub('\'', '', word)
         if re.sub('___', word, generated_sentence) == sentence:
             break
-    return generated_sentence, word
+
+    input_text = f'\'{generated_sentence}\'에서 \'___\' 자리에 어울리는 단어를 4개 추천해 줘'
+    while True:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system",
+                 "content": "문장에서 \'___\' 자리에 어울리는 단어를 4개 추천해 달라는 요청을 받으면 반드시 \'단어1:단어2:단어3:단어4\' 형식으로 출력해줘"},
+                {"role": "user",
+                 "content": '\'우주에는 수없이 많은 ___이 빛나고 있습니다.\'에서 \'___\' 자리에 어울리는 단어를 4개 추천해 줘'},
+                {"role": "assistant", "content": '\'행성:태양:블랙홀:은하\''},
+                {"role": "user", "content": '\'___는 별을 보지 않는다\'에서 \'___\' 자리에 어울리는 단어를 4개 추천해 줘'},
+                {"role": "assistant", "content": '\'물리학자:과학자:수학자:의사\''},
+                {"role": "user", "content": '\'그래도 ___ 날이 앞으로 많기를\'에서 \'___\' 자리에 어울리는 단어를 4개 추천해 줘'},
+                {"role": "assistant", "content": '\'나쁜:슬픈:우울한:기쁜\''},
+                {"role": "user", "content": input_text}
+            ]
+        )
+        generated_words = response.choices[0].message.content
+        generated_words = re.sub('\'', '', generated_words)
+        generated_words = generated_words.split(':')
+
+        if len(generated_words) == 4:
+            break
+
+    if word not in generated_words:
+        generated_words[3] = word
+    words = generated_words
+
+    # words = [word, '이브', '프시케', '푸른 수염의 아내']
+    random.shuffle(words)
+    return generated_sentence, words
