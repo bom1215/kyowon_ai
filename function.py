@@ -3,10 +3,15 @@ import os
 import openai
 import re
 import random
+import time
+import yaml
+
+with open('api.yaml') as f:
+    api = yaml.load(f, Loader=yaml.FullLoader)
 
 # api key setting
-openai.api_key = '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'
-os.environ['_BARD_API_KEY'] = "YQhNS9UR3VNnVtRLmRTy6A2XCY7YBpSx70lPTldi-1te9g2l3jrMJ1xHFOrOjYoGLdQgig."
+openai.api_key = api['openai.api_key']
+os.environ['_BARD_API_KEY'] = api['BARD_API_KEY']
 
 
 def isKoreanIncluded(sentence):
@@ -56,60 +61,103 @@ def make_sentence(keyword):
 
 def make_blank(sentence):
     '''
-    :param sentence: 빈칸을 만들 문장
-    :return: 빈칸이 생긴 문장
+    :param sentence: bard에서 생성한 문장
+    :return: sentence에 빈칸을 뚫은 문장(str)과 후보 단어 4개(리스트)
     '''
     input_text = f'\'{sentence}\' 문장에서 단어 1개를 ___으로 대체해서 출력하고 ___ 자리에 있던 단어를 출력해 줘'
 
     while True:
         # gpt에서 제대로된 답변을 했는지 확인
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "문장에서 단어 1개를 ___으로 대체해서 출력하고 ___ 자리에 있던 단어를 출력해달라는 요청을 받으면 반드시 '단어 1개를 ___으로 대체한 문장':'___ 자리에 있던 단어' 형식으로 출력해줘"},
-                {"role": "user", "content": '\'우주에는 수없이 많은 별이 빛나고 있습니다.\' 문장에서 단어 1개를 ___으로 대체해서 출력하고 ___ 자리에 있던 단어를 출력해 줘'},
-                {"role": "assistant", "content": '우주에는 수없이 많은 ___이 빛나고 있습니다.\':\'별\''},
-                {"role": "user", "content": '\'천문학자는 별을 보지 않는다\' 문장에서 단어 1개를 ___으로 대체해서 출력하고 ___ 자리에 있던 단어를 출력해 줘'},
-                {"role": "assistant", "content": '___는 별을 보지 않는다\':\'천문학자\''},
-                {"role": "user", "content": '\'그래도 좋은 날이 앞으로 많기를\' 문장에서 단어 1개를 ___으로 대체해서 출력하고 ___ 자리에 있던 단어를 출력해 줘'},
-                {"role": "assistant", "content": '그래도 ___ 날이 앞으로 많기를\':\'좋은\''},
-                {"role": "user", "content": input_text}
-            ]
-        )
-        generated_sentence, word = response.choices[0].message.content.split(':')[:2]
-        generated_sentence, word = generated_sentence.strip(), word.strip()
-        generated_sentence, word = re.sub('\'', '', generated_sentence), re.sub('\'', '', word)
-        if re.sub('___', word, generated_sentence) == sentence:
-            break
+        try:
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "문장에서 단어 1개를 ___으로 대체해서 출력하고 ___ 자리에 있던 단어를 출력해달라는 요청을 받으면 반드시 '단어 1개를 ___으로 대체한 문장':'___ 자리에 있던 단어' 형식으로 출력해줘"},
+                    {"role": "user", "content": '\'우주에는 수없이 많은 별이 빛나고 있습니다.\' 문장에서 단어 1개를 ___으로 대체해서 출력하고 ___ 자리에 있던 단어를 출력해 줘'},
+                    {"role": "assistant", "content": '우주에는 수없이 많은 ___이 빛나고 있습니다.\':\'별\''},
+                    {"role": "user", "content": '\'천문학자는 별을 보지 않는다\' 문장에서 단어 1개를 ___으로 대체해서 출력하고 ___ 자리에 있던 단어를 출력해 줘'},
+                    {"role": "assistant", "content": '___는 별을 보지 않는다\':\'천문학자\''},
+                    {"role": "user", "content": '\'그래도 좋은 날이 앞으로 많기를\' 문장에서 단어 1개를 ___으로 대체해서 출력하고 ___ 자리에 있던 단어를 출력해 줘'},
+                    {"role": "assistant", "content": '그래도 ___ 날이 앞으로 많기를\':\'좋은\''},
+                    {"role": "user", "content": input_text}
+                ]
+            )
+            generated_sentence, word = response.choices[0].message.content.split(':')[:2]
+            generated_sentence, word = generated_sentence.strip(), word.strip()
+            generated_sentence, word = re.sub('\'', '', generated_sentence), re.sub('\'', '', word)
+        except openai.error.RateLimitError:
+            print('open ai 사용량 제한')
+            time.sleep(20)
+        else:
+            if re.sub('___', word, generated_sentence) == sentence:
+                break
 
     input_text = f'\'{generated_sentence}\'에서 \'___\' 자리에 어울리는 단어를 4개 추천해 줘'
     while True:
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system",
-                 "content": "문장에서 \'___\' 자리에 어울리는 단어를 4개 추천해 달라는 요청을 받으면 반드시 \'단어1:단어2:단어3:단어4\' 형식으로 출력해줘"},
-                {"role": "user",
-                 "content": '\'우주에는 수없이 많은 ___이 빛나고 있습니다.\'에서 \'___\' 자리에 어울리는 단어를 4개 추천해 줘'},
-                {"role": "assistant", "content": '\'행성:태양:블랙홀:은하\''},
-                {"role": "user", "content": '\'___는 별을 보지 않는다\'에서 \'___\' 자리에 어울리는 단어를 4개 추천해 줘'},
-                {"role": "assistant", "content": '\'물리학자:과학자:수학자:의사\''},
-                {"role": "user", "content": '\'그래도 ___ 날이 앞으로 많기를\'에서 \'___\' 자리에 어울리는 단어를 4개 추천해 줘'},
-                {"role": "assistant", "content": '\'나쁜:슬픈:우울한:기쁜\''},
-                {"role": "user", "content": input_text}
-            ]
-        )
-        generated_words = response.choices[0].message.content
-        generated_words = re.sub('\'', '', generated_words)
-        generated_words = generated_words.split(':')
-
-        if len(generated_words) == 4:
-            break
+        try:
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system",
+                     "content": "문장에서 \'___\' 자리에 어울리는 단어를 4개 추천해 달라는 요청을 받으면 반드시 \'단어1:단어2:단어3:단어4\' 형식으로 출력해줘"},
+                    {"role": "user",
+                     "content": '\'우주에는 수없이 많은 ___이 빛나고 있습니다.\'에서 \'___\' 자리에 어울리는 단어를 4개 추천해 줘'},
+                    {"role": "assistant", "content": '\'행성:태양:블랙홀:은하\''},
+                    {"role": "user", "content": '\'___는 별을 보지 않는다\'에서 \'___\' 자리에 어울리는 단어를 4개 추천해 줘'},
+                    {"role": "assistant", "content": '\'물리학자:과학자:수학자:의사\''},
+                    {"role": "user", "content": '\'그래도 ___ 날이 앞으로 많기를\'에서 \'___\' 자리에 어울리는 단어를 4개 추천해 줘'},
+                    {"role": "assistant", "content": '\'나쁜:슬픈:우울한:기쁜\''},
+                    {"role": "user", "content": input_text}
+                ]
+            )
+            generated_words = response.choices[0].message.content
+            generated_words = re.sub('\'', '', generated_words)
+            generated_words = generated_words.split(':')
+        except openai.error.RateLimitError:
+            print('open ai 사용량 제한')
+            time.sleep(20)
+        else:
+            if len(generated_words) == 4:
+                break
 
     if word not in generated_words:
         generated_words[3] = word
     words = generated_words
-
-    # words = [word, '이브', '프시케', '푸른 수염의 아내']
     random.shuffle(words)
     return generated_sentence, words
+
+
+def order(sentence):
+    '''
+    :param sentence: bard에서 생성한 문장
+    :return: 생성한 문장을 4 부분으로 분할한 텍스트들(리스트)
+    '''
+    input_text = f'\'{sentence}\' 문장을 4 부분으로 분할해줘'
+    while True:
+        try:
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system",
+                     "content": "\'___\' 문장을 4 부분으로 분할해 달라는 요청을 받으면 반드시 \'부분1:부분2:부분3:부분4\' 형식으로 출력해줘"},
+                    {"role": "user",
+                     "content": '\'우주에는 수없이 많은 별이 빛나고 있습니다.\' 문장을 4 부분으로 분할해줘'},
+                    {"role": "assistant", "content": '\'우주에는:수없이 많은:별이 빛나고:있습니다.\''},
+                    {"role": "user", "content": '\'천문학자는 별을 보지 않는다\' 문장을 4 부분으로 분할해줘'},
+                    {"role": "assistant", "content": '\'천문학자는:별을:보지:않는다\''},
+                    {"role": "user", "content": '\'그래도 좋은 날이 앞으로 많기를\' 문장을 4 부분으로 분할해줘'},
+                    {"role": "assistant", "content": '\'그래도:좋은 날이:앞으로:많기를\''},
+                    {"role": "user", "content": input_text}
+                ]
+            )
+            parts = response.choices[0].message.content
+            parts = re.sub('\'', '', parts)
+            parts = parts.split(':')
+        except openai.error.RateLimitError:
+            print('open ai 사용량 제한')
+            time.sleep(20)
+        else:
+            if len(parts) == 4:
+                break
+    random.shuffle(parts)
+    return parts
