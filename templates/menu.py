@@ -145,7 +145,7 @@ def choose_type():
                 st.experimental_rerun()
             if quiz:
                 # 혹시 state.condition을 quiz가 아닌 다른 문자로 하신다면 main.py 38번째 줄 ["learn", "quiz"] 부분을 바꿔주세요!
-                state.condition = 'quiz'
+                state.condition = 'word_quiz'
                 st.experimental_rerun()
             
         second = c4.form("문장")
@@ -173,5 +173,8 @@ def choose_type():
             quiz = cc2.form_submit_button("🧩   퀴즈풀기")
             if learning:
                 state.type = '문장'
-                state.condition = 'learn'
+                state.condition = 'sent_learn'
+                st.experimental_rerun()
+            if quiz:
+                state.condition = "sent_quiz"
                 st.experimental_rerun()

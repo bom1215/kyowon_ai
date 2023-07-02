@@ -8,62 +8,62 @@ QUIZZES = [
         "question": "1",
         "options": ["London", "Paris", "Berlin", "Rome"],
         "answer": 1,
-        "image" : 'ice-bear.jpg'
+        "image" : "templates/ice-bear.jpg"
     },
     {
         "question": "2",
         "options": ["Mars", "Venus", "Jupiter", "Saturn"],
         "answer": 0,
-        "image" : 'ice-bear.jpg'
+        "image" : "templates/ice-bear.jpg"
     },
     {
         "question": "3",
         "options": ["Mars", "Venus", "Jupiter", "Saturn"],
         "answer": 0,
-        "image" : 'ice-bear.jpg'
+        "image" : "templates/ice-bear.jpg"
     },
     {
         "question": "4",
         "options": ["Mars", "Venus", "Jupiter", "Saturn"],
         "answer": 0,
-        "image" : 'ice-bear.jpg'
+        "image" : "templates/ice-bear.jpg"
     },
     {
         "question": "5",
         "options": ["Mars", "Venus", "Jupiter", "Saturn"],
         "answer": 0,
-        "image" : 'ice-bear.jpg'
+        "image" : "templates/ice-bear.jpg"
     },
     {
         "question": "6",
         "options": ["Mars", "Venus", "Jupiter", "Saturn"],
         "answer": 0,
-        "image" : 'ice-bear.jpg'
+        "image" : "templates/ice-bear.jpg"
     },
     {
         "question": "7",
         "options": ["Mars", "Venus", "Jupiter", "Saturn"],
         "answer": 0,
-        "image" : 'ice-bear.jpg'
+        "image" : "templates/ice-bear.jpg"
     },
     {
         "question": "8",
         "options": ["Mars", "Venus", "Jupiter", "Saturn"],
         "answer": 0,
-        "image" : 'ice-bear.jpg'
+        "image" : "templates/ice-bear.jpg"
     },
     {
         "question": "9",
         "options": ["Mars", "Venus", "Jupiter", "Saturn"],
         "answer": 0,
-        "image" : 'ice-bear.jpg'
+        "image" : "templates/ice-bear.jpg"
     },
     {
         "question": "10",
         "options": ["Mars", "Venus", "Jupiter", "Saturn"],
         "answer": 0,
-        "image" : 'ice-bear.jpg'
-    },
+        "image" : "templates/ice-bear.jpg"
+    }
     
 ]
 
@@ -123,6 +123,7 @@ def sent_learn():
         state.blank = "______"
 
     if state.quiz_counter == 10:
+        state.prev_condition = state.condition
         state.condition = "quiz_score"
         set_quiz()
 
@@ -135,7 +136,7 @@ def sent_learn():
                 "question": "는 화성이다.",
                 "options": ["Mars", "Venus", "Jupiter", "Saturn"],
                 "answer": 0,
-                "image" : 'ice-bear.jpg'
+                "image" : 'templates/ice-bear.jpg'
             }
         ]
         quiz = quiz[0]
@@ -166,6 +167,7 @@ def sent_learn():
 def sent_quiz():
     st.set_page_config(page_title="문장 만들기", page_icon = "❓")
     if state.quiz_counter == 10:
+        state.prev_condition = state.condition
         state.condition = "quiz_score"
         set_quiz()
 
@@ -195,6 +197,8 @@ def quiz_score(score):
             st.experimental_rerun()
         
         if col3.button("홈 화면"):
+            state.quiz_counter = 0
+            state.correct_answers = 0
             state.condition = "choose_difficulty"
             st.experimental_rerun()
     else:
