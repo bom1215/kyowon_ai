@@ -5,9 +5,9 @@ import time
 from PIL import Image
 
 def create_image(text):
-  with open('key.yaml') as f:
+  with open('api.yaml') as f:
     api = yaml.load(f, Loader=yaml.FullLoader)
-  key = api["openai_key"]
+  key = api["image_key"]
 
   openai.api_key=key
   print("requested")
