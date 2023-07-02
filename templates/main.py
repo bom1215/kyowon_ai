@@ -1,6 +1,7 @@
 import streamlit as st
 from streamlit import session_state as state
 from streamlit_extras.switch_page_button import switch_page
+import quiz
 
 def main():
     if 'prev_condition' not in state:
@@ -30,6 +31,20 @@ def main():
     elif state.condition == "learn":
         learning()
 
+    elif state.condition == "word_quiz":
+        quiz.set_quiz()
+        quiz.word_quiz()
+
+    elif state.condition == "sent_learn":
+        quiz.set_quiz()
+        quiz.sent_learn()
+
+    elif state.condition == "sent_quiz":
+        quiz.set_quiz()
+        quiz.sent_quiz()
+
+    elif state.condition == "quiz_score":
+        quiz.set_quiz()
         
 def choose_difficulty():
     st.set_page_config(page_title = "Difficulty", layout="wide", initial_sidebar_state="collapsed")
@@ -163,9 +178,9 @@ def choose_type():
                 state.type = '단어'
                 state.condition = 'learn'
                 st.experimental_rerun()
-            # if quiz:
-            #     state.quiz = True
-            #     st.experimental_rerun()
+            if quiz:
+                state.condition = 'word_quiz'
+                st.experimental_rerun()
             
         second = c4.form("문장")
         with second:
@@ -192,8 +207,12 @@ def choose_type():
             quiz = cc2.form_submit_button("🧩   퀴즈풀기")
             if learning:
                 state.type = '문장'
-                state.condition = 'learn'
+                state.condition = 'sent_learn'
                 st.experimental_rerun()
+            if quiz:
+                state.condition = 'sent_quiz'
+                st.experimental_rerun()
+
         
         
 QUIZZES = [
