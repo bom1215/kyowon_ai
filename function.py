@@ -5,6 +5,7 @@ import re
 import random
 import time
 import yaml
+from image import *
 
 with open('api.yaml') as f:
     api = yaml.load(f, Loader=yaml.FullLoader)
@@ -56,6 +57,10 @@ def make_sentence(keyword):
                 break
             else:
                 continue
+    
+    #이미지 생성
+    create_image(sentence)
+
     return sentence
 
 
