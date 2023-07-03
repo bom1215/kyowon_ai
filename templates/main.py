@@ -1,6 +1,5 @@
 import streamlit as st
 from streamlit import session_state as state
-from streamlit_extras.switch_page_button import switch_page
 from learn import learning
 from menu import *
 import quiz
@@ -60,6 +59,9 @@ def main():
 
     elif state.condition == "quiz_score":
         quiz.set_quiz()
+
+    elif state.condition == "loading":
+        quiz.loading()
 
 if __name__ == "__main__":
     main()
