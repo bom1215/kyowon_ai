@@ -1,15 +1,16 @@
 import streamlit as st
 from streamlit import session_state as state
 from learn import learning
-from menu import *
+from menu import choose_difficulty, choose_topic, choose_type
+import test
 import quiz
 
 def main():
     if 'prev_condition' not in state:
-        state.prev_condition = "choose_difficulty"
+        state.prev_condition = "assessment"
     
     if 'condition' not in state:
-        state.condition = "choose_difficulty"
+        state.condition = "assessment"
         
     if 'difficulty' not in state:
         state.difficulty = ''
@@ -20,7 +21,11 @@ def main():
     if 'type' not in state:
         state.type = ''
 
-    if state.condition == "choose_difficulty":
+    if state.condition == "assessment":
+        test.set_test_quiz()
+        test.assessment()
+    
+    elif state.condition == "choose_difficulty":
         difficulty = choose_difficulty()
         if difficulty is not None:
             state.condition = "choose_topic"
