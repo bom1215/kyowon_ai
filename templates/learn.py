@@ -41,7 +41,7 @@ def learning(difficulty, topic, type):
         QUIZZES = SEN_QUIZZES
             
     if difficulty == '초급' and topic == '학교생활':
-            with open('학교_초급.csv', 'r', encoding = 'utf-8') as f:
+            with open('data/학교_초급.csv', 'r', encoding = 'utf-8') as f:
                 reader = csv.reader(f)
                 words = list(reader)[1:]
                 
