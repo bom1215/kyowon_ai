@@ -15,7 +15,7 @@ def choose_difficulty():
         return state.difficulty
     
     else:
-        st.markdown(f"<h1 style='text-align: center; color: gray;'>AI야어여</h1>", unsafe_allow_html=True)
+        st.markdown(f"<h1 style='text-align: center; color: gray;'>프로그램 제목</h1>", unsafe_allow_html=True)
         for _ in range(3): st.write('')
         c1, c2, c3, c4, c5 = st.columns([1, 0.1, 1, 0.1, 1])
 
@@ -70,7 +70,7 @@ def choose_topic(difficulty):
         return state.topic
     
     else:
-        st.markdown(f"<h1 style='text-align: center; color: gray;'>AI야어여</h1>", unsafe_allow_html=True)
+        st.markdown(f"<h1 style='text-align: center; color: gray;'>프로그램 제목</h1>", unsafe_allow_html=True)
         for _ in range(3): st.write('')
         c1, c2, c3, c4, c5 = st.columns([0.1, 1, 0.1, 1, 0.1])
         
@@ -112,7 +112,7 @@ def choose_type():
         return state.condition
     
     else:
-        st.markdown(f"<h1 style='text-align: center; color: gray;'>AI야어여</h1>", unsafe_allow_html=True)
+        st.markdown(f"<h1 style='text-align: center; color: gray;'>프로그램 제목</h1>", unsafe_allow_html=True)
         for _ in range(3): st.write('')
         c1, c2, c3, c4, c5 = st.columns([0.1, 1, 0.1, 1, 0.1])
         
@@ -173,7 +173,7 @@ def choose_type():
             quiz = cc2.form_submit_button("🧩   퀴즈풀기")
             if learning:
                 state.type = '문장'
-                state.condition = 'learn'
+                state.condition = 'sent_learn'
                 st.experimental_rerun()
             if quiz:
                 state.type = '문장'
