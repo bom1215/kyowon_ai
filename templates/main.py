@@ -61,6 +61,7 @@ def main():
         quiz.set_quiz()
 
     elif state.condition == "loading":
+        quiz.set_quiz()
         quiz.loading()
 
 if __name__ == "__main__":

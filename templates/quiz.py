@@ -8,76 +8,15 @@ base = pd.read_csv("data/학교_초급.csv")
 blank = pd.read_csv("data/학교생활-초급_blank.csv")
 order = pd.read_csv("data/학교생활-초급_order.csv")
 
-QUIZZES = [
-    {
-        "question": "1",
-        "options": ["London", "Paris", "Berlin", "Rome"],
-        "answer": 1,
-        "image" : "templates/ice-bear.jpg"
-    },
-    {
-        "question": "2",
-        "options": ["Mars", "Venus", "Jupiter", "Saturn"],
-        "answer": 0,
-        "image" : "templates/ice-bear.jpg"
-    },
-    {
-        "question": "3",
-        "options": ["Mars", "Venus", "Jupiter", "Saturn"],
-        "answer": 0,
-        "image" : "templates/ice-bear.jpg"
-    },
-    {
-        "question": "4",
-        "options": ["Mars", "Venus", "Jupiter", "Saturn"],
-        "answer": 0,
-        "image" : "templates/ice-bear.jpg"
-    },
-    {
-        "question": "5",
-        "options": ["Mars", "Venus", "Jupiter", "Saturn"],
-        "answer": 0,
-        "image" : "templates/ice-bear.jpg"
-    },
-    {
-        "question": "6",
-        "options": ["Mars", "Venus", "Jupiter", "Saturn"],
-        "answer": 0,
-        "image" : "templates/ice-bear.jpg"
-    },
-    {
-        "question": "7",
-        "options": ["Mars", "Venus", "Jupiter", "Saturn"],
-        "answer": 0,
-        "image" : "templates/ice-bear.jpg"
-    },
-    {
-        "question": "8",
-        "options": ["Mars", "Venus", "Jupiter", "Saturn"],
-        "answer": 0,
-        "image" : "templates/ice-bear.jpg"
-    },
-    {
-        "question": "9",
-        "options": ["Mars", "Venus", "Jupiter", "Saturn"],
-        "answer": 0,
-        "image" : "templates/ice-bear.jpg"
-    },
-    {
-        "question": "10",
-        "options": ["Mars", "Venus", "Jupiter", "Saturn"],
-        "answer": 0,
-        "image" : "templates/ice-bear.jpg"
-    }
-    
-]
-
 def set_quiz():    
     if 'quiz_counter' not in state:
         state.quiz_counter = 0
     
     if 'correct_answers' not in state:
         state.correct_answers = 0
+
+    if 'quiz_len' not in state:
+        state.quiz_len = 10
 
     if state.condition == "quiz_score":
         quiz_score(state.correct_answers)
@@ -88,8 +27,9 @@ def word_quiz():
 
     if 'answer' not in state:
         state.answer = 0
+    state.quiz_len = len(blank)
 
-    if state.quiz_counter == 10:
+    if state.quiz_counter == state.quiz_len:
         state.prev_condition = state.condition
         state.condition = "quiz_score"
         set_quiz()
@@ -98,18 +38,18 @@ def word_quiz():
         st.title("단어 퀴즈")
 
         st.subheader(f"{state.quiz_counter + 1}번 문제")
-        quiz = QUIZZES[state.quiz_counter]
+        quiz = blank.iloc[state.quiz_counter]
+        c1, c2, c3 = st.columns([1, 3, 1])
+        image_url = base.iloc[state.quiz_counter]['word_img']
+        c2.image(image_url, width=400)
 
-        image_url = quiz['image']
-        st.image(image_url, use_column_width=True)
-
-        col1, col2, col3, col4 = st.columns(4)
+        col1, col2, col3, col4 = st.columns([1,1,1,1])
         col_list = [col1, col2, col3, col4]
         for idx, col in enumerate(col_list):
-            if col.button(quiz['options'][idx]):
-                state.answer = idx
+            if col.button(eval(quiz['options'])[idx]):
+                state.answer = eval(quiz['options'])[idx]
 
-                if state.answer == quiz['answer']:
+                if state.answer == quiz['word']:
                     #time.sleep(1)
                     st.success("맞았습니다!")
                     time.sleep(0.3)
@@ -124,11 +64,8 @@ def word_quiz():
 
 def sent_learn():
     st.set_page_config(page_title="문장 학습", page_icon = "❓")
-    if 'blank' not in state:
-        state.blank = "______"
-
     if "answer_list" not in state:
-        state.answer_list = [state.blank] * 10
+        state.answer_list = ["______"] * 10
 
 
     if state.quiz_counter == 10:        
@@ -143,21 +80,35 @@ def sent_learn():
         quiz_score(state.correct_answers)
 
     else:
-        st.title("문장 학습")
+        st.title("문장 퀴즈")
         st.subheader(f"{state.quiz_counter + 1}번 문제")
 
         quiz = blank.iloc[state.quiz_counter]
+        c1, c2, c3 = st.columns([1, 8, 1])
         image_url = quiz['sen_img']
-        st.image(image_url, use_column_width=True)
-        container1 = st.container()
+        c2.image(image_url, width=400)
+
+        container1 = c2.container()
         sent = blank['question'].iloc[state.quiz_counter]
         #answer = eval(quiz['options'])[blank['answer'].iloc[state.quiz_counter]]
         sent = "f'"+sent.replace('{}', ':blue[**{state.answer_list[state.quiz_counter]}**]')+"'"
-        
-        container1.write(eval(sent))
+        st.markdown("""
+                    <style>
+                        [data-testid="column"] {
+                        text-align: center;
+                        } 
+                        [data-testid="stImage"] {
+                        display: block;
+                        margin-left: auto;
+                        margin-right: auto;
+                        }
+                    </style>
+                    """,
+                        unsafe_allow_html=True,)
+        container1.subheader(eval(sent))
 
         with container1:
-            col1, col2, col3, col4 = st.columns(4)
+            col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
             col_list = [col1, col2, col3, col4]
             for idx, col in enumerate(col_list):
                 if col.button(eval(quiz['options'])[idx]):
@@ -168,18 +119,18 @@ def sent_learn():
 
         co1, co2, co3, co4 = st.columns([0.2, 1, 1, 0.2])
         if state.quiz_counter == 9:
-            if col1.button("이전", disabled = (state.quiz_counter < 1)):
+            if co1.button("이전", disabled = (state.quiz_counter < 1)):
                 state.quiz_counter -= 1
                 st.experimental_rerun()
-            if col4.button("완료", disabled = (state.quiz_counter > 10)):
+            if co4.button("완료", disabled = (state.quiz_counter > 10)):
                 state.quiz_counter += 1         
                 st.experimental_rerun()
 
         else:
-            if col1.button("이전", disabled = (state.quiz_counter < 1)):
+            if co1.button("이전", disabled = (state.quiz_counter < 1)):
                 state.quiz_counter -= 1
                 st.experimental_rerun()
-            if col4.button("다음", disabled = (state.quiz_counter > 10)):
+            if co4.button("다음", disabled = (state.quiz_counter > 10)):
                 state.quiz_counter += 1            
                 st.experimental_rerun()
     
@@ -208,15 +159,14 @@ def quiz_score(score):
         col2.subheader("정답")
 
         if state.prev_condition == "word_quiz":
-            quiz = QUIZZES
+            quiz = base['word'].to_list()
         elif state.prev_condition == "sent_learn":
             quiz = blank['word'].to_list()
-        
-        print(quiz)
+
         for i, word in enumerate(quiz):
             col2.text(f"{i+1}. {word}")
 
-        if col3.button("다시 풀기", disabled=(score >= 7)):
+        if col3.button("다시 풀기", disabled=(score >= 6)):
             state.condition = "loading"
             state.quiz_counter = 0
             state.correct_answers = 0
@@ -231,14 +181,23 @@ def quiz_score(score):
         main.main()
 
 def loading():
-    st.set_page_config(page_title = "difficulty", layout="wide")
+    st.set_page_config(page_title = "로딩 중", layout="wide")
     st.markdown(f"<h1 style='text-align: center; color: black;'></h1>", unsafe_allow_html=True)
     st.markdown(f"<h1 style='text-align: center; color: black;'></h1>", unsafe_allow_html=True)
     st.markdown(f"<h1 style='text-align: center; color: black;'>퀴즈 생성 중</h1>", unsafe_allow_html=True)
-
+    st.markdown(f"<h1 style='text-align: center; color: black;'></h1>", unsafe_allow_html=True)
+    st.markdown("""
+                    <style>
+                        .stButton {
+                        text-align: center;
+                        }
+                    </style>
+                    """,
+                        unsafe_allow_html=True,)
     time.sleep(5)
 
-    if st.button("퀴즈 생성 완료"):
+    c1, c2, c3 = st.columns(3)
+    if c2.button("퀴즈 생성 완료"):
         state.condition = state.prev_condition
         state.prev_condition = state.condition
         st.experimental_rerun()
