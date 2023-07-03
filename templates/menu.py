@@ -173,7 +173,7 @@ def choose_type():
             quiz = cc2.form_submit_button("🧩   퀴즈풀기")
             if learning:
                 state.type = '문장'
-                state.condition = 'learn'
+                state.condition = 'sent_learn'
                 st.experimental_rerun()
             if quiz:
                 state.type = '문장'
