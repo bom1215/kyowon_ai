@@ -1,5 +1,6 @@
 import streamlit as st
 from streamlit import session_state as state
+import csv
 
 WORD_QUIZZES = [
     {
@@ -66,6 +67,7 @@ def learning(difficulty, topic, type):
         if "page" not in state:
             state.page = 0
 
+        
         def nextpage(): state.page += 1
         def prevpage(): state.page -= 1
 
