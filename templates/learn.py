@@ -1,6 +1,5 @@
 import streamlit as st
 from streamlit import session_state as state
-import csv
 
 WORD_QUIZZES = [
     {
@@ -41,7 +40,7 @@ def learning(difficulty, topic, type):
         QUIZZES = SEN_QUIZZES
             
     if difficulty == '초급' and topic == '학교생활':
-            with open('data/학교_초급.csv', 'r', encoding = 'utf-8') as f:
+            with open('학교_초급.csv', 'r', encoding = 'utf-8') as f:
                 reader = csv.reader(f)
                 words = list(reader)[1:]
                 
@@ -67,7 +66,6 @@ def learning(difficulty, topic, type):
         if "page" not in state:
             state.page = 0
 
-        
         def nextpage(): state.page += 1
         def prevpage(): state.page -= 1
 
