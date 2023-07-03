@@ -1,5 +1,9 @@
 api.yaml
+data/
+images/
 __pycache__/
 .jpg
 .pyc
+data/
+images/
 *.csv

@@ -177,5 +177,5 @@ def choose_type():
                 st.experimental_rerun()
             if quiz:
                 state.type = '문장'
-                state.condition = "sent_quiz"
+                state.condition = "sent_learn"
                 st.experimental_rerun()
