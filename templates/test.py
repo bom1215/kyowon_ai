@@ -57,7 +57,7 @@ def assessment():
         del state.test_answer_list
         state.prev_condition = state.condition
         state.condition = "test_quiz_score"
-        set_test_quiz()
+        st.experimental_rerun()
     
     else:
         st.title("진단 평가")
@@ -129,6 +129,8 @@ def assessment():
                     st.experimental_rerun()
             
 def test_quiz_score2(score):
+    st.set_page_config(page_title="진단평가 결과", layout="wide", initial_sidebar_state="collapsed")
+    
     if state.condition == "test_quiz_score":
         st.markdown(f"<h1 style='text-align: center; color: gray;'>AI야어여 진단평가</h1>", unsafe_allow_html=True)
         for _ in range(3): st.write('')
@@ -166,12 +168,14 @@ def test_quiz_score2(score):
             next_button = c4.button("다음")
             
             if home_button:
-                check = True
+                state.test_quiz_counter = 0
+                state.test_correct_answers = 0
                 state.condition = "choose_difficulty"
                 st.experimental_rerun()
                 
             if next_button:
-                check = True
+                state.test_quiz_counter = 0
+                state.test_correct_answers = 0
                 state.difficulty = diff
                 state.condition = "choose_topic"
                 st.experimental_rerun()   
