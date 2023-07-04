@@ -10,7 +10,7 @@ def main():
         state.prev_condition = "assessment"
     
     if 'condition' not in state:
-        state.condition = "assessment"
+        state.condition = "choose_difficulty"
         
     if 'difficulty' not in state:
         state.difficulty = ''
@@ -21,10 +21,16 @@ def main():
     if 'type' not in state:
         state.type = ''
 
-    if state.condition == "assessment":
+    if state.condition == "home":
+        condition = test.home()
+        if condition is not None:
+            state.condition = 'assessment'
+            main()
+    
+    elif state.condition == "assessment":
         test.set_test_quiz()
         test.assessment()
-    
+        
     elif state.condition == "choose_difficulty":
         difficulty = choose_difficulty()
         if difficulty is not None:
