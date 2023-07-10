@@ -5,9 +5,9 @@ import re
 import random
 import time
 import yaml
-from image import *
+#from image import *
 
-with open('api.yaml') as f:
+with open('./api.yaml') as f:
     api = yaml.load(f, Loader=yaml.FullLoader)
 
 # api key setting
@@ -35,36 +35,107 @@ def isKoreanIncluded(sentence):
     return False
 
 
-def make_sentence(keyword):
+def make_sentence_free(keyword):
     '''
     :param keyword: 문장 생성에 사용할 키워드
     :return: bard를 사용해서 생성한 keyword 관련 문장
     '''
 
     # 프롬프트 문장+사용자 키워드
-    input_text = f'이미지 생성 모델에 사용 가능하고 {keyword}에 관련된 문장을 1개 생성한 뒤 생성한 문장의 처음과 끝부분에 $을 추가해서 출력해 줘'
+    input_text = f'이미지 생성 모델에 사용 가능하고 \'{keyword}\'에 관련된 초등학생 수준의 간단한 문장을 1줄 생성해줘'
 
     # 문장 생성시 기대하지 않은 결과가 나오는 경우가 존재하므로 예외처리를 통해 잘못된 문장이 생성되는 것 방지
     while True:
         try:
             response = bardapi.core.Bard().get_answer(input_text)
-            sentence = response['choices'][0]['content'][0].split('$')[1]
+            print(response)
+            sentence = response['choices'][0]['content'][0].split('\n\n')[1]
+            sentence = re.sub(r"[^ㄱ-ㅣ가-힣\s]", "", sentence).lstrip().rstrip()
         except:
             print('bard 문장 생성 오류')
+            time.sleep(20)
         else:
             # 문장이 한글 대신 다른 언어로 작성된 경우 다시 생성
             if isKoreanIncluded(sentence):
                 break
             else:
                 continue
-    
-    #이미지 생성
-    create_image(sentence)
-
     return sentence
 
 
-def make_blank(sentence):
+def make_sentence_subject(keyword):
+    '''
+    :param keyword: 문장 생성에 사용할 키워드
+    :return: bard를 사용해서 생성한 keyword 관련 문장
+    '''
+
+    # 프롬프트 문장+사용자 키워드
+    input_text = f'이미지 생성에 사용 가능하고 \'{keyword}\' 단어가 포함된 초등학생 수준의 간단한 문장을 1줄 생성해줘'
+
+    # 문장 생성시 기대하지 않은 결과가 나오는 경우가 존재하므로 예외처리를 통해 잘못된 문장이 생성되는 것 방지
+    while True:
+        try:
+            response = bardapi.core.Bard().get_answer(input_text)
+            print(response)
+            sentence = response['choices'][0]['content'][0].split('\n\n')[1]
+            sentence = re.sub(r"[^ㄱ-ㅣ가-힣\s]", "", sentence).lstrip().rstrip()
+        except:
+            print('bard 문장 생성 오류')
+            time.sleep(20)
+        else:
+            # 문장이 한글 대신 다른 언어로 작성된 경우 다시 생성
+            if isKoreanIncluded(sentence):
+                break
+            else:
+                continue
+    return sentence
+
+
+def make_blank_subject(sentence, word):
+    '''
+    :param sentence: bard에서 생성한 문장, word: 문장 생성에 사용한 단어
+    :return: sentence에 빈칸을 뚫은 문장(str)과 후보 단어 4개(리스트)
+    '''
+
+    sentence = re.sub(word, '___', sentence)
+
+    input_text = f'\'{sentence}\'에서 \'___\' 자리에 어울리는 단어를 4개 추천해 줘'
+    while True:
+        try:
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system",
+                     "content": "문장에서 \'___\' 자리에 어울리는 단어를 4개 추천해 달라는 요청을 받으면 반드시 \'단어1:단어2:단어3:단어4\' 형식으로 출력해줘"},
+                    {"role": "user",
+                     "content": '\'우주에는 수없이 많은 ___이 빛나고 있습니다.\'에서 \'___\' 자리에 어울리는 단어를 4개 추천해 줘'},
+                    {"role": "assistant", "content": '\'행성:태양:블랙홀:은하\''},
+                    {"role": "user", "content": '\'___는 별을 보지 않는다\'에서 \'___\' 자리에 어울리는 단어를 4개 추천해 줘'},
+                    {"role": "assistant", "content": '\'물리학자:과학자:수학자:의사\''},
+                    {"role": "user", "content": '\'그래도 ___ 날이 앞으로 많기를\'에서 \'___\' 자리에 어울리는 단어를 4개 추천해 줘'},
+                    {"role": "assistant", "content": '\'나쁜:슬픈:우울한:기쁜\''},
+                    {"role": "user", "content": input_text}
+                ]
+            )
+            generated_words = response.choices[0].message.content
+            generated_words = re.sub('\'', '', generated_words)
+            generated_words = generated_words.split(':')
+        except openai.error.RateLimitError:
+            print('open ai 사용량 제한')
+            time.sleep(20)
+        else:
+            if len(generated_words) == 4:
+                break
+
+    if word not in generated_words:
+        generated_words[3] = word
+    words = generated_words
+    random.shuffle(words)
+    answer = words.index(word)
+    return words, answer
+
+
+def make_blank_free(sentence):
     '''
     :param sentence: bard에서 생성한 문장
     :return: sentence에 빈칸을 뚫은 문장(str)과 후보 단어 4개(리스트)
@@ -127,9 +198,10 @@ def make_blank(sentence):
 
     if word not in generated_words:
         generated_words[3] = word
+    answer = word
     words = generated_words
     random.shuffle(words)
-    return generated_sentence, words
+    return generated_sentence, words, answer
 
 
 def order(sentence):
@@ -166,3 +238,15 @@ def order(sentence):
                 break
     random.shuffle(parts)
     return parts
+
+
+def init_sent_quiz(problems):
+    sents = []
+    options = []
+    for word in problems:
+        sent = make_sentence_subject(word)
+        option, _ = make_blank_subject(sent, word)
+        sent.replace(word, '{}')
+        sents.append(sent)
+        options.append(option)
+    return sents, options
