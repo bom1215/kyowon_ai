@@ -218,12 +218,14 @@ def choose_type():
                 state.type = '문장'
                 state.condition = 'learn'
                 if state.difficulty == '초급' and state.topic == '학교생활':
+                    learn.QUIZZES = []
                     for word in learn.words:
                         sent = function.make_sentence_subject(word)
                         learn.QUIZZES.append({"word": sent, "image": './templates/ice-bear.jpg'})
                 elif 'free:' in state.topic:
                     topic = state.topic.split(':')[1]
-                    for i in range(10):
+                    learn.QUIZZES = []
+                    for i in range(2):
                         sent = function.make_sentence_free(topic)
                         learn.QUIZZES.append({"word": sent, "image": './templates/ice-bear.jpg'})
 
@@ -242,12 +244,14 @@ def choose_type():
                 elif 'free:' in state.topic:
                     topic = state.topic.split(':')[1]
                     quiz_code.problems = []
+                    quiz_code.sents = []
+                    quiz_code.options = []
                     quiz_code.images = []
-                    for i in range(10):
+                    for i in range(2):
                         sent = function.make_sentence_free(topic)
                         generated_sent, option, answer = function.make_blank_free(sent)
                         quiz_code.problems.append(answer)
-                        quiz_code.sents.append(generated_sent)
+                        quiz_code.sents.append(generated_sent.replace('___', '{}'))
                         quiz_code.options.append(option)
                         quiz_code.images.append('./templates/ice-bear.jpg')
                         # quiz_code.images.append(이미지)

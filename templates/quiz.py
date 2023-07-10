@@ -3,7 +3,6 @@ from streamlit import session_state as state
 import time
 import main
 import pandas as pd
-import random
 
 words = list(pd.read_csv("data/학교_초급.csv").word)
 problems = []
@@ -20,11 +19,14 @@ def set_quiz():
     if 'correct_answers' not in state:
         state.correct_answers = 0
 
+    if 'replay' not in state:
+        state.replay = False
+
     if 'quiz_len' not in state:
         state.quiz_len = 10
 
     if state.condition == "quiz_score":
-        quiz_score(state.correct_answers)
+        quiz_score(state.correct_answers, state.quiz_len)
 
 
 def word_quiz():
@@ -68,12 +70,12 @@ def word_quiz():
 
 def sent_learn():
     st.set_page_config(page_title="문장 학습", page_icon = "❓")
-
+    state.quiz_len = len(problems)
     if "answer_list" not in state:
         state.answer_list = ["______"] * 10
 
-    if state.quiz_counter == 10:
-        for i in range(10):
+    if state.quiz_counter == state.quiz_len:
+        for i in range(state.quiz_len):
             answer = problems[i]
             if state.answer_list[i] == answer:
                 state.correct_answers += 1
@@ -82,7 +84,7 @@ def sent_learn():
         del state.answer_list
         state.prev_condition = state.condition
         state.condition = "quiz_score"
-        quiz_score(state.correct_answers)
+        quiz_score(state.correct_answers, state.quiz_len)
 
     else:
         st.title("문장 퀴즈")
@@ -144,7 +146,7 @@ def sent_learn():
 
 def sent_quiz():
     st.set_page_config(page_title="문장 만들기", page_icon = "❓")
-    if state.quiz_counter == 10:
+    if state.quiz_counter == state.quiz_len:
         state.prev_condition = state.condition
         state.condition = "quiz_score"
         set_quiz()
@@ -153,28 +155,21 @@ def sent_quiz():
         st.title("문장 만들기")
 
 
-def quiz_score(score):
+def quiz_score(score, length):
     if state.condition == "quiz_score":
-        st.title("단어 학습")
-
-        if score > 5:
+        st.title("학습 결과")
+        st.markdown(f"<h4 style='text-align: center; color: black;'></h1>", unsafe_allow_html=True)
+        if (score / length) > 0.5:
             color = 'green'
         else:
             color = 'red'
-        col1, col2, col3 = st.columns(3)
+        col1, col2, col3 = st.columns([1, 1, 1])
         col1.subheader("결과")
-        col1.title(f':{color}[{score*10}] 점')
         col2.subheader("정답")
+        col3.subheader("이동")
 
-        if state.prev_condition == "word_quiz":
-            quiz = problems
-        elif state.prev_condition == "sent_learn":
-            quiz = problems
-
-        for i, word in enumerate(quiz):
-            col2.text(f"{i+1}. {word}")
-
-        if col3.button("다시 풀기", disabled=(score >= 6)):
+        col1, title, text, col3 = st.columns([1, 0.5, 0.5, 1])
+        if col3.button("다시 풀기", disabled=((score / length) > 0.6)):
             state.condition = "loading"
             state.quiz_counter = 0
             state.correct_answers = 0
@@ -185,6 +180,21 @@ def quiz_score(score):
             state.correct_answers = 0
             state.condition = "choose_difficulty"
             st.experimental_rerun()
+
+        col1.title(f':{color}[{score * 10}] / {length * 10} 점')
+
+        if state.prev_condition == "word_quiz":
+            quiz = problems
+        elif state.replay:
+            quiz = problems
+        elif state.prev_condition == "sent_learn":
+            quiz = problems
+
+        title.write(" ")
+        text.write(" ")
+        for i, a in enumerate(quiz):
+            title.write(f"{i + 1}번")
+            text.write(f"{a}")
     else:
         main.main()
 
@@ -209,7 +219,9 @@ def loading():
     if c2.button("퀴즈 생성 완료"):
         state.condition = state.prev_condition
         state.prev_condition = state.condition
+        state.replay = True
         st.experimental_rerun()
-    
+
+
 if __name__ == "__main__":
     word_quiz()
