@@ -48,7 +48,6 @@ def make_sentence_free(keyword):
     while True:
         try:
             response = bardapi.core.Bard().get_answer(input_text)
-            print(response)
             sentence = response['choices'][0]['content'][0].split('\n\n')[1]
             sentence = re.sub(r"[^ㄱ-ㅣ가-힣\s]", "", sentence).lstrip().rstrip()
         except:
@@ -76,7 +75,6 @@ def make_sentence_subject(keyword):
     while True:
         try:
             response = bardapi.core.Bard().get_answer(input_text)
-            print(response)
             sentence = response['choices'][0]['content'][0].split('\n\n')[1]
             sentence = re.sub(r"[^ㄱ-ㅣ가-힣\s]", "", sentence).lstrip().rstrip()
         except:
