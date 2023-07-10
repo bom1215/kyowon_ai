@@ -226,7 +226,6 @@ def choose_type():
                     for i in range(10):
                         sent = function.make_sentence_free(topic)
                         learn.QUIZZES.append({"word": sent, "image": './templates/ice-bear.jpg'})
-
                 st.experimental_rerun()
             if quiz:
                 state.type = '문장'
