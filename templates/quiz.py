@@ -1,9 +1,7 @@
 import streamlit as st
 from streamlit import session_state as state
 import time
-import main
 import pandas as pd
-import random
 
 words = list(pd.read_csv("data/학교_초급.csv").word)
 problems = []
@@ -20,11 +18,11 @@ def set_quiz():
     if 'correct_answers' not in state:
         state.correct_answers = 0
 
-    if 'quiz_len' not in state:
-        state.quiz_len = 10
-    
     if 'replay' not in state:
         state.replay = False
+
+    if 'quiz_len' not in state:
+        state.quiz_len = 10
 
     if state.condition == "quiz_score":
         quiz_score(state.correct_answers, state.quiz_len)
@@ -35,10 +33,11 @@ def word_quiz():
     if 'answer' not in state:
         state.answer = 0
     state.quiz_len = len(problems)
+
     if state.quiz_counter == state.quiz_len:
         state.prev_condition = state.condition
         state.condition = "quiz_score"
-        st.experimental_rerun()
+        set_quiz()
 
     else:
         st.title("단어 퀴즈")
@@ -70,12 +69,12 @@ def word_quiz():
 
 def sent_learn():
     st.set_page_config(page_title="문장 학습", page_icon = "❓")
-
+    state.quiz_len = len(problems)
     if "answer_list" not in state:
         state.answer_list = ["______"] * 10
-        
-    if state.quiz_counter == 10:
-        for i in range(10):
+
+    if state.quiz_counter == state.quiz_len:
+        for i in range(state.quiz_len):
             answer = problems[i]
             if state.answer_list[i] == answer:
                 state.correct_answers += 1
@@ -84,17 +83,18 @@ def sent_learn():
         del state.answer_list
         state.prev_condition = state.condition
         state.condition = "quiz_score"
-        st.experimental_rerun()
+        quiz_score(state.correct_answers, state.quiz_len)
 
     else:
-        print(state.quiz_len)
         st.title("문장 퀴즈")
         st.subheader(f"{state.quiz_counter + 1}번 문제")
+
         c1, c2, c3 = st.columns([1, 8, 1])
         image_url = images[state.quiz_counter]
         c2.image(image_url, width=400)
 
         container1 = c2.container()
+
         sent = sents[state.quiz_counter]
         option = options[state.quiz_counter]
         #answer = eval(quiz['options'])[blank['answer'].iloc[state.quiz_counter]]
@@ -125,7 +125,7 @@ def sent_learn():
                     state.answer_list[state.quiz_counter] = state.blank
                     st.experimental_rerun()
 
-        co1, co2, co3, co4 = st.columns([1,1,1,1])
+        co1, co2, co3, co4 = st.columns([0.2, 1, 1, 0.2])
         if state.quiz_counter == 9:
             if co1.button("이전", disabled = (state.quiz_counter < 1)):
                 state.quiz_counter -= 1
@@ -145,17 +145,17 @@ def sent_learn():
 
 def sent_quiz():
     st.set_page_config(page_title="문장 만들기", page_icon = "❓")
-    state.quiz_len = len(order)
     if state.quiz_counter == state.quiz_len:
         state.prev_condition = state.condition
         state.condition = "quiz_score"
-        st.experimental_rerun()
+        set_quiz()
 
     else:
         st.title("문장 만들기")
 
+
 def quiz_score(score, length):
-        if state.condition == "quiz_score":
+    if state.condition == "quiz_score":
         st.title("학습 결과")
         st.markdown(f"<h4 style='text-align: center; color: black;'></h1>", unsafe_allow_html=True)
         if (score / length) > 0.5:
@@ -185,9 +185,9 @@ def quiz_score(score, length):
         if state.prev_condition == "word_quiz":
             quiz = problems
         elif state.replay:
-            quiz = sents
+            quiz = problems
         elif state.prev_condition == "sent_learn":
-            quiz = sents
+            quiz = problems
 
         title.write(" ")
         text.write(" ")
@@ -195,7 +195,9 @@ def quiz_score(score, length):
             title.write(f"{i + 1}번")
             text.write(f"{a}")
     else:
+        import main
         main.main()
+
 
 def loading():
     st.set_page_config(page_title = "로딩 중", layout="wide")
@@ -219,6 +221,7 @@ def loading():
         state.prev_condition = state.condition
         state.replay = True
         st.experimental_rerun()
-    
+
+
 if __name__ == "__main__":
     word_quiz()
