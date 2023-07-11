@@ -1,28 +1,35 @@
 import streamlit as st
 from streamlit import session_state as state
 import csv
+import function
+import pandas as pd
 
+words = list(pd.read_csv("data/학교_초급.csv").word)
 WORD_QUIZZES = [
     {
-        "word" : "구름",
-        "image" : "templates/ice-bear.jpg"
+        "word": "구름",
+        "image": "templates/ice-bear.jpg"
     },
     {
-        "word" : "강아지",
-        "image" :"templates/ice-bear.jpg"
+        "word": "강아지",
+        "image":"templates/ice-bear.jpg"
     }
 ]
 
 SEN_QUIZZES = [
     {
-        "word" : "하늘이 파랗다",
-        "image" : "templates/ice-bear.jpg"
+        "word": "하늘이 파랗다",
+        "image": "templates/ice-bear.jpg"
     },
     {
-        "word" : "사과가 빨갛다",
-        "image" :"templates/ice-bear.jpg"
+        "word": "사과가 빨갛다",
+        "image": "templates/ice-bear.jpg"
     }
 ]
+
+
+QUIZZES = []
+
 
 def make_grid(cols,rows):
     grid = [0]*cols
@@ -31,30 +38,16 @@ def make_grid(cols,rows):
             grid[i] = st.columns(rows)
     return grid
 
+
 def learning(difficulty, topic, type):
+    global QUIZZES
     st.set_page_config(page_title = "Learn", layout="wide")
-    
-    # difficulty, topic, type에 따라 QUIZZES에 들어가는 걸 바꾸시면 될 것 같아요
-    if type == "단어":
-        QUIZZES = WORD_QUIZZES
-    elif type == "문장":
-        QUIZZES = SEN_QUIZZES
-            
-    if difficulty == '초급' and topic == '학교생활':
-            with open('data/학교_초급.csv', 'r', encoding = 'utf-8') as f:
-                reader = csv.reader(f)
-                words = list(reader)[1:]
-                
-            if type == "단어":
-                QUIZZES = []
-                for i in words:
-                    QUIZZES.append({"word":i[2], "image":i[4]})
-            
-            if type == "문장":
-                QUIZZES = []
-                for i in words:
-                    QUIZZES.append({"word":i[1], "image":i[3]})
-                    
+    # # difficulty, topic, type에 따라 QUIZZES에 들어가는 걸 바꾸시면 될 것 같아요
+    # if type == "단어":
+    #     QUIZZES = WORD_QUIZZES
+    # elif type == "문장":
+    #     QUIZZES = SEN_QUIZZES
+
     if state.condition != 'learn':
         state.prev_condition = state.condition
         return True
@@ -143,4 +136,5 @@ def learning(difficulty, topic, type):
             if c2.button("학습 종료하기"):
                 state.page = 0
                 state.condition = 'choose_type'
+                QUIZZES = []
                 st.experimental_rerun()

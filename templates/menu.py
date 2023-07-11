@@ -1,5 +1,9 @@
 import streamlit as st
 from streamlit import session_state as state
+import learn
+import random
+import quiz as quiz_code
+import function
 
 TOPIC = {
         "초급" : ["자기소개", "학교생활"],
@@ -17,7 +21,7 @@ def choose_difficulty():
     else:
         st.markdown(f"<h1 style='text-align: center; color: gray;'>AI야어여</h1>", unsafe_allow_html=True)
         for _ in range(3): st.write('')
-        c1, c2, c3, c4, c5 = st.columns([1, 0.1, 1, 0.1, 1])
+        c1, c2, c3, c4, c5, c6 = st.columns([1, 0.1, 1, 0.1, 1, 1])
 
         first = c1.form("초급")
         with first:
@@ -61,7 +65,21 @@ def choose_difficulty():
                 state.condition = "choose_topic"
                 st.experimental_rerun()
 
-        
+        fourth = c6.form("자유주제")
+        with fourth:
+            for _ in range(3):
+                st.write('')
+            st.markdown(f"<h1 style='text-align: center; color: black;'>자유주제</h1>", unsafe_allow_html=True)
+            for _ in range(2):
+                st.write('')
+            cc1, cc2, cc3 = st.columns([1, 0.6, 1])
+            submit = cc2.form_submit_button("선택")
+            if submit:
+                state.difficulty = '자유주제'
+                state.condition = "choose_topic"
+                st.experimental_rerun()
+
+
 def choose_topic(difficulty):
     st.set_page_config(page_title = "Topic",layout="wide", initial_sidebar_state="collapsed")
     
@@ -72,37 +90,50 @@ def choose_topic(difficulty):
     else:
         st.markdown(f"<h1 style='text-align: center; color: gray;'>AI야어여</h1>", unsafe_allow_html=True)
         for _ in range(3): st.write('')
-        c1, c2, c3, c4, c5 = st.columns([0.1, 1, 0.1, 1, 0.1])
-        
-        topics = TOPIC[difficulty]
-        
-        first = c2.form(topics[0])
-        with first:
-            for _ in range(3):
-                st.write('')
-            st.markdown(f"<h1 style='text-align: center; color: black;'>{topics[0]}</h1>", unsafe_allow_html=True)
-            for _ in range(2):
-                st.write('')
-            cc1, cc2, cc3 = st.columns([1, 0.4, 1])
-            submit = cc2.form_submit_button("선택")
-            if submit:
-                state.topic = topics[0]
-                state.condition = "choose_type"
-                st.experimental_rerun()
-                
-        second = c4.form(topics[1])
-        with second:
-            for _ in range(3):
-                st.write('')
-            st.markdown(f"<h1 style='text-align: center; color: black;'>{topics[1]}</h1>", unsafe_allow_html=True)
-            for _ in range(2):
-                st.write('')
-            cc1, cc2, cc3 = st.columns([1, 0.4, 1])
-            submit = cc2.form_submit_button("선택")
-            if submit:
-                state.topic = topics[1]
-                state.condition = "choose_type"
-                st.experimental_rerun()
+        if state.difficulty != '자유주제':
+            c1, c2, c3, c4, c5 = st.columns([0.1, 1, 0.1, 1, 0.1])
+
+            topics = TOPIC[difficulty]
+
+            first = c2.form(topics[0])
+            with first:
+                for _ in range(3):
+                    st.write('')
+                st.markdown(f"<h1 style='text-align: center; color: black;'>{topics[0]}</h1>", unsafe_allow_html=True)
+                for _ in range(2):
+                    st.write('')
+                cc1, cc2, cc3 = st.columns([1, 0.4, 1])
+                submit = cc2.form_submit_button("선택")
+                if submit:
+                    state.topic = topics[0]
+                    state.condition = "choose_type"
+                    st.experimental_rerun()
+
+            second = c4.form(topics[1])
+            with second:
+                for _ in range(3):
+                    st.write('')
+                st.markdown(f"<h1 style='text-align: center; color: black;'>{topics[1]}</h1>", unsafe_allow_html=True)
+                for _ in range(2):
+                    st.write('')
+                cc1, cc2, cc3 = st.columns([1, 0.4, 1])
+                submit = cc2.form_submit_button("선택")
+                if submit:
+                    state.topic = topics[1]
+                    state.condition = "choose_type"
+                    st.experimental_rerun()
+        else:
+            c1, c2, c3 = st.columns([0.1, 1, 0.1])
+            first = c2.form('주제 선택')
+            with first:
+                free_topic = st.text_input("주제를 입력하세요")
+                cc1, cc2, cc3 = st.columns([1, 0.4, 1])
+                submit = cc2.form_submit_button("선택")
+                if submit:
+                    state.topic = 'free:'+free_topic
+                    state.condition = "choose_type"
+                    st.experimental_rerun()
+
 
 def choose_type():
     st.set_page_config(page_title = "Type",layout="wide", initial_sidebar_state="collapsed")
@@ -142,10 +173,22 @@ def choose_type():
             if learning:
                 state.type = '단어'
                 state.condition = 'learn'
+                if state.difficulty == '초급' and state.topic == '학교생활':
+                        for word in learn.words:
+                            learn.QUIZZES.append({"word": word, "image": './templates/ice-bear.jpg'})
+
                 st.experimental_rerun()
             if quiz:
                 state.type = '단어'
                 state.condition = 'word_quiz'
+                quiz_code.problems = random.sample(quiz_code.words, 10)
+                for word in quiz_code.problems:
+                    option = random.sample(quiz_code.words, 4)
+                    if word not in option:
+                        option[random.randint(0, 3)] = word
+                    quiz_code.options.append(option)
+                    quiz_code.images.append('./templates/ice-bear.jpg')
+                    #quiz_code.images.append(이미지)
                 st.experimental_rerun()
             
         second = c4.form("문장")
@@ -174,8 +217,39 @@ def choose_type():
             if learning:
                 state.type = '문장'
                 state.condition = 'learn'
+                if state.difficulty == '초급' and state.topic == '학교생활':
+                    for word in learn.words:
+                        sent = function.make_sentence_subject(word)
+                        learn.QUIZZES.append({"word": sent, "image": './templates/ice-bear.jpg'})
+                elif 'free:' in state.topic:
+                    topic = state.topic.split(':')[1]
+                    for i in range(10):
+                        sent = function.make_sentence_free(topic)
+                        learn.QUIZZES.append({"word": sent, "image": './templates/ice-bear.jpg'})
                 st.experimental_rerun()
             if quiz:
                 state.type = '문장'
                 state.condition = "sent_learn"
+                if state.difficulty == '초급' and state.topic == '학교생활':
+                    quiz_code.problems = random.sample(quiz_code.words, 10)
+                    quiz_code.sents, quiz_code.options = function.init_sent_quiz(quiz_code.problems)
+                    quiz_code.images = []
+                    for sent, word in zip(quiz_code.sents, quiz_code.problems):
+                        quiz_code.images.append('./templates/ice-bear.jpg')
+                        #quiz_code.images.append(이미지)
+                    quiz_code.wrong = []
+                elif 'free:' in state.topic:
+                    topic = state.topic.split(':')[1]
+                    quiz_code.problems = []
+                    quiz_code.images = []
+                    for i in range(10):
+                        sent = function.make_sentence_free(topic)
+                        generated_sent, option, answer = function.make_blank_free(sent)
+                        quiz_code.problems.append(answer)
+                        quiz_code.sents.append(generated_sent)
+                        quiz_code.options.append(option)
+                        quiz_code.images.append('./templates/ice-bear.jpg')
+                        # quiz_code.images.append(이미지)
                 st.experimental_rerun()
+
+
