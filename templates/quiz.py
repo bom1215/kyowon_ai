@@ -155,7 +155,7 @@ def sent_quiz():
         st.title("문장 만들기")
 
 def quiz_score(score, length):
-        if state.condition == "quiz_score":
+    if state.condition == "quiz_score":
         st.title("학습 결과")
         st.markdown(f"<h4 style='text-align: center; color: black;'></h1>", unsafe_allow_html=True)
         if (score / length) > 0.5:
