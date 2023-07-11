@@ -7,9 +7,10 @@ import pandas as pd
 
 with open('api.yaml') as f:
     api = yaml.load(f, Loader=yaml.FullLoader)
-key = api["image_key"]
-
+#key = api["image_key"]
+key = api["openai.api_key"]
 openai.api_key=key
+
 print("requested")
 
 def create_image(text):
