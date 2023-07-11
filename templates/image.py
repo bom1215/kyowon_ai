@@ -4,6 +4,7 @@ import os
 import time
 from PIL import Image
 import pandas as pd
+import urllib.request as req
 
 with open('api.yaml') as f:
     api = yaml.load(f, Loader=yaml.FullLoader)
@@ -28,7 +29,7 @@ def create_image(text):
     size="256x256" #1024x1024, 512x512, 256x256
   )
   image_url = response['data'][0]['url']
-
+  
   #print(image_url)
   return image_download(image_url,text)
 
@@ -41,9 +42,9 @@ def image_download(url,text):
     이미지 경로
   """
   name="./images/"+text+".jpg" #저장될 이미지 파일 이름
-  os.system("curl "+url+"> "+name)
-
-  img = Image.open(name) #이미지 확인하기 
+  #os.system("curl "+url+"> "+name)
+  download = req.urlretrieve(url,name)
+  #img = Image.open(name) #이미지 확인하기 
   return name 
 
 def csv2image():
@@ -62,4 +63,5 @@ def csv2image():
   df.to_csv(title,index=False)
   
 if __name__ == '__main__':
-  csv2image()
+  create_image("천문학자는 별을 보지 않는다")
+  #csv2image()
