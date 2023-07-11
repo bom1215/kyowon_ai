@@ -67,11 +67,9 @@ def word_quiz():
                 st.experimental_rerun()
 
 def sent_learn():
-    st.set_page_config(page_title="문장 학습", page_icon = "❓")
+    st.set_page_config(page_title="문장 퀴즈 : 빈칸 채우기", page_icon = "❓")
     if "answer_list" not in state:
         state.answer_list = ["______"] * 10
-
-    print("why don't you change?")
 
     state.quiz_len = len(blank)
     quiz = blank
@@ -90,7 +88,6 @@ def sent_learn():
         st.experimental_rerun()
 
     else:
-        print(state.quiz_len)
         st.title("문장 퀴즈")
         st.subheader(f"{state.quiz_counter + 1}번 문제")
 
@@ -147,15 +144,69 @@ def sent_learn():
     
 
 def sent_quiz():
-    st.set_page_config(page_title="문장 만들기", page_icon = "❓")
-    state.quiz_len = len(order)
+    st.set_page_config(page_title="문장 퀴즈 : 단어 배열", page_icon = "❓")
+    if "sent_order" not in state:
+        state.sent_order = [["______"] * 4] * 10
+
+    quiz = order
+    state.quiz_len = len(quiz)
     if state.quiz_counter == state.quiz_len:
         state.prev_condition = state.condition
         state.condition = "quiz_score"
         st.experimental_rerun()
 
     else:
-        st.title("문장 만들기")
+        st.title("문장 퀴즈")
+        st.subheader(f"{state.quiz_counter + 1}번 문제")
+        quiz = quiz.iloc[state.quiz_counter]
+
+        c1, c2, c3 = st.columns([1, 8, 1])
+        image_url = quiz['sen_img']
+        c2.image(image_url, width=400)
+
+        st.markdown("""
+                    <style>
+                        [data-testid="column"] {
+                        text-align: center;
+                        } 
+                        [data-testid="stImage"] {
+                        display: block;
+                        margin-left: auto;
+                        margin-right: auto;
+                        }
+                    </style>
+                    """,
+                        unsafe_allow_html=True,)
+        container1 = c2.container()
+        sent = ' '.join(state.sent_order[state.quiz_counter])
+        container1.subheader(f'{sent}')
+
+        with container1:
+            col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+            col_list = [col1, col2, col3, col4]
+            for idx, col in enumerate(col_list):
+                if col.button(eval(quiz['options'])[idx]):
+                    
+                    st.experimental_rerun()
+
+        co1, co2, co3, co4 = st.columns([1,1,1,1])
+        if state.quiz_counter == 9:
+            if co1.button("이전", disabled = (state.quiz_counter < 1)):
+                state.quiz_counter -= 1
+                st.experimental_rerun()
+            if co4.button("완료", disabled = (state.quiz_counter > 10)):
+                state.quiz_counter += 1         
+                st.experimental_rerun()
+
+        else:
+            if co1.button("이전", disabled = (state.quiz_counter < 1)):
+                state.quiz_counter -= 1
+                st.experimental_rerun()
+            if co4.button("다음", disabled = (state.quiz_counter > 10)):
+                state.quiz_counter += 1            
+                st.experimental_rerun()
+
+
 
 def quiz_score(score, length):
     st.set_page_config(page_title="결과", page_icon = "🏆", layout="wide")
