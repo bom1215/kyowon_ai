@@ -4,6 +4,7 @@ import learn
 import random
 import quiz as quiz_code
 import function
+from image import *
 
 TOPIC = {
         "초급" : ["자기소개", "학교생활"],
@@ -175,7 +176,9 @@ def choose_type():
                 state.condition = 'learn'
                 if state.difficulty == '초급' and state.topic == '학교생활':
                         for word in learn.words:
-                            learn.QUIZZES.append({"word": word, "image": './templates/ice-bear.jpg'})
+                            path = create_image(word)
+                            learn.QUIZZES.append({"word": word, "image": path})
+                            #learn.QUIZZES.append({"word": word, "image": './templates/ice-bear.jpg'})
 
                 st.experimental_rerun()
             if quiz:
@@ -220,12 +223,16 @@ def choose_type():
                 if state.difficulty == '초급' and state.topic == '학교생활':
                     for word in learn.words:
                         sent = function.make_sentence_subject(word)
-                        learn.QUIZZES.append({"word": sent, "image": './templates/ice-bear.jpg'})
+                        path = create_image(sent)
+                        learn.QUIZZES.append({"word": sent, "image": path})
+                        #learn.QUIZZES.append({"word": sent, "image": './templates/ice-bear.jpg'})
                 elif 'free:' in state.topic:
                     topic = state.topic.split(':')[1]
                     for i in range(10):
                         sent = function.make_sentence_free(topic)
-                        learn.QUIZZES.append({"word": sent, "image": './templates/ice-bear.jpg'})
+                        path = create_image(sent)
+                        learn.QUIZZES.append({"word": sent, "image": path})
+                        #learn.QUIZZES.append({"word": sent, "image": './templates/ice-bear.jpg'})
                 st.experimental_rerun()
             if quiz:
                 state.type = '문장'
