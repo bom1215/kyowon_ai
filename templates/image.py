@@ -5,6 +5,7 @@ import time
 from PIL import Image
 import pandas as pd
 import urllib.request as req
+import googletrans
 
 with open('api.yaml') as f:
     api = yaml.load(f, Loader=yaml.FullLoader)
@@ -14,17 +15,22 @@ openai.api_key=key
 
 print("requested")
 
+translator=googletrans.Translator()
+print("set translator")
+
 def create_image(text):
   """
-  주어진 text를 이용하여 이미지 생성
+  주어진 text를 영어로 번역한 후, 해당 text를 이용하여 이미지 생성
   Parameter:
     text : 이미지로 생성할 텍스트
   return
     이미지 경로
   """
-  new_text=text+",2d illust drawing"
+  #new_text=text+",2d illust drawing"
+  
+  new_text=translator.translate(text,dest='en') #번역
   response = openai.Image.create(
-    prompt=new_text,
+    prompt=new_text+",2d illust drawing",
     n=1,
     size="256x256" #1024x1024, 512x512, 256x256
   )
@@ -42,8 +48,9 @@ def image_download(url,text):
     이미지 경로
   """
   name="./images/"+text+".jpg" #저장될 이미지 파일 이름
-  #os.system("curl "+url+"> "+name)
   download = req.urlretrieve(url,name)
+
+  #os.system("curl "+url+"> "+name)
   #img = Image.open(name) #이미지 확인하기 
   return name 
 
