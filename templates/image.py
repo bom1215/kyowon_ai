@@ -28,7 +28,9 @@ def create_image(text):
   """
   #new_text=text+",2d illust drawing"
   
-  new_text=translator.translate(text,dest='en') #번역
+  new_text=translator.translate(text,dest='en').text #번역
+  print(new_text)
+
   response = openai.Image.create(
     prompt=new_text+",2d illust drawing",
     n=1,
