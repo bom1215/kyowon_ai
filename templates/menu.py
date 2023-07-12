@@ -247,11 +247,11 @@ def choose_type():
                 state.type = '문장'
                 state.condition = "sent_learn"
                 if state.difficulty == '초급' and state.topic == '학교생활':
-                    quiz_code.problems = random.sample(quiz_code.words, 10)
+                    quiz_code.problems = random.sample(quiz_code.words, 3)
                     quiz_code.sents, quiz_code.options = function.init_sent_quiz(quiz_code.problems)
                     quiz_code.images = []
                     for sent, word in zip(quiz_code.sents, quiz_code.problems):
-                        path = create_image(sent)
+                        path = create_image(sent.replace('{}',word))
                         quiz_code.images.append(path)
                         # quiz_code.images.append('./templates/ice-bear.jpg')
                     quiz_code.wrong = []
