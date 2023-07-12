@@ -5,6 +5,7 @@ from menu import choose_difficulty, choose_topic, choose_type
 import test
 import quiz
 
+
 def main():
     if 'prev_condition' not in state:
         state.prev_condition = "assessment"

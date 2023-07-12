@@ -9,9 +9,9 @@ import googletrans
 
 with open('api.yaml') as f:
     api = yaml.load(f, Loader=yaml.FullLoader)
-#key = api["image_key"]
+# key = api["image_key"]
 key = api["openai.api_key"]
-openai.api_key=key
+openai.api_key = key
 
 print("requested")
 
@@ -56,21 +56,23 @@ def image_download(url,text):
   #img = Image.open(name) #이미지 확인하기 
   return name 
 
+
 def csv2image():
-  title="data/학교생활-초급.csv"
-  df = pd.read_csv(title)  
+    title = "data/학교생활-초급.csv"
+    df = pd.read_csv(title)
 
-  df['sen_img']='0'
-  df['word_img']='0'
-  print(df)
-  for i in range(0,len(df)):
-    sen=df.loc[i,'sentence']
-    word=df.loc[i,'word']
-    df.loc[i,'sen_img']=create_image(sen)
-    df.loc[i,'word_img']=create_image(word)
+    df['sen_img'] = '0'
+    df['word_img'] = '0'
+    print(df)
+    for i in range(0, len(df)):
+        sen = df.loc[i, 'sentence']
+        word = df.loc[i, 'word']
+        df.loc[i, 'sen_img'] = create_image(sen)
+        df.loc[i, 'word_img'] = create_image(word)
 
-  df.to_csv(title,index=False)
-  
+    df.to_csv(title, index=False)
+
+
 if __name__ == '__main__':
-  create_image("천문학자는 별을 보지 않는다")
-  #csv2image()
+    create_image("천문학자는 별을 보지 않는다")
+    # csv2image()

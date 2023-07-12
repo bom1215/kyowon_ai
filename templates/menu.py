@@ -12,6 +12,7 @@ TOPIC = {
         "고급" : ["식문화", "대중문화"]
     }
 
+
 def choose_difficulty():
     st.set_page_config(page_title = "difficulty", layout="wide", initial_sidebar_state="collapsed")
 
@@ -190,8 +191,9 @@ def choose_type():
                     if word not in option:
                         option[random.randint(0, 3)] = word
                     quiz_code.options.append(option)
-                    quiz_code.images.append('./templates/ice-bear.jpg')
-                    #quiz_code.images.append(이미지)
+                    path = create_image(word)
+                    quiz_code.images.append(path)
+                    # quiz_code.images.append('./templates/ice-bear.jpg')
                 st.experimental_rerun()
             
         second = c4.form("문장")
@@ -221,6 +223,7 @@ def choose_type():
                 state.type = '문장'
                 state.condition = 'learn'
                 if state.difficulty == '초급' and state.topic == '학교생활':
+                    learn.QUIZZES = []
                     for word in learn.words:
                         sent = function.make_sentence_subject(word)
                         path = create_image(sent)
@@ -228,7 +231,8 @@ def choose_type():
                         #learn.QUIZZES.append({"word": sent, "image": './templates/ice-bear.jpg'})
                 elif 'free:' in state.topic:
                     topic = state.topic.split(':')[1]
-                    for i in range(10):
+                    learn.QUIZZES = []
+                    for i in range(2):
                         sent = function.make_sentence_free(topic)
                         path = create_image(sent)
                         learn.QUIZZES.append({"word": sent, "image": path})
@@ -242,21 +246,26 @@ def choose_type():
                     quiz_code.sents, quiz_code.options = function.init_sent_quiz(quiz_code.problems)
                     quiz_code.images = []
                     for sent, word in zip(quiz_code.sents, quiz_code.problems):
-                        quiz_code.images.append('./templates/ice-bear.jpg')
-                        #quiz_code.images.append(이미지)
+                        path = create_image(sent)
+                        quiz_code.images.append(path)
+                        # quiz_code.images.append('./templates/ice-bear.jpg')
                     quiz_code.wrong = []
                 elif 'free:' in state.topic:
                     topic = state.topic.split(':')[1]
                     quiz_code.problems = []
+                    quiz_code.sents = []
+                    quiz_code.options = []
                     quiz_code.images = []
-                    for i in range(10):
+                    for i in range(2):
                         sent = function.make_sentence_free(topic)
                         generated_sent, option, answer = function.make_blank_free(sent)
                         quiz_code.problems.append(answer)
-                        quiz_code.sents.append(generated_sent)
+                        quiz_code.sents.append(generated_sent.replace('___', '{}'))
                         quiz_code.options.append(option)
-                        quiz_code.images.append('./templates/ice-bear.jpg')
-                        # quiz_code.images.append(이미지)
+                        path = create_image(sent)
+                        quiz_code.images.append(path)
+                        #quiz_code.images.append('./templates/ice-bear.jpg')
+
                 st.experimental_rerun()
 
 
