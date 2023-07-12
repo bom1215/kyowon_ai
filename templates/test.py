@@ -20,7 +20,7 @@ def set_test_quiz():
 quizzes = blank.sample(n = 3)
 
 def home():
-    st.set_page_config(page_title = "difficulty", layout="wide", initial_sidebar_state="collapsed")
+    st.set_page_config(page_title = "Ai야어여", layout="wide", initial_sidebar_state="collapsed")
     
     if state.condition != 'home':
         state.prev_condition = state.condition
@@ -63,6 +63,20 @@ def assessment():
         st.title("진단 평가")
 
         st.subheader(f"{state.test_quiz_counter + 1}번 문제")
+        
+        st.markdown("""
+                    <style>
+                        [data-testid="column"] {
+                        text-align: center;
+                        } 
+                        [data-testid="stImage"] {
+                        display: block;
+                        margin-left: auto;
+                        margin-right: auto;
+                        }
+                    </style>
+                    """,
+                        unsafe_allow_html=True,)
         
         if state.test_quiz_counter < 3:
             quiz = blank.iloc[state.test_quiz_counter]
@@ -107,7 +121,7 @@ def assessment():
                     </style>
                     """,
                         unsafe_allow_html=True,)
-            container1.write(eval(sent))
+            container1.subheader(eval(sent))
 
             with container1:
                 col1, col2, col3, col4 = st.columns(4)

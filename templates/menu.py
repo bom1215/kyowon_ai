@@ -14,7 +14,9 @@ TOPIC = {
 
 
 def choose_difficulty():
-    st.set_page_config(page_title = "difficulty", layout="wide", initial_sidebar_state="collapsed")
+    st.set_page_config(page_title = "난이도 선택", layout="wide", initial_sidebar_state="collapsed")
+    st.image('templates/user.png', width=200)
+
 
     if state.condition != 'choose_difficulty':
         state.prev_condition = state.condition
@@ -23,7 +25,7 @@ def choose_difficulty():
     else:
         st.markdown(f"<h1 style='text-align: center; color: gray;'>AI야어여</h1>", unsafe_allow_html=True)
         for _ in range(3): st.write('')
-        c1, c2, c3, c4, c5, c6 = st.columns([1, 0.1, 1, 0.1, 1, 1])
+        c1, c2, c3, c4, c5, c6, c7 = st.columns([1, 0.1, 1, 0.1, 1, 0.1, 1])
 
         first = c1.form("초급")
         with first:
@@ -47,7 +49,7 @@ def choose_difficulty():
             for _ in range(2):
                 st.write('')
             cc1, cc2, cc3 = st.columns([1, 0.6, 1])
-            submit = cc2.form_submit_button("선택")
+            submit = cc2.form_submit_button("선택", disabled=True)
             if submit:
                 state.difficulty = '중급'
                 state.condition = "choose_topic"
@@ -61,13 +63,13 @@ def choose_difficulty():
             for _ in range(2):
                 st.write('')
             cc1, cc2, cc3 = st.columns([1, 0.6, 1])
-            submit = cc2.form_submit_button("선택")
+            submit = cc2.form_submit_button("선택", disabled=True)
             if submit:
                 state.difficulty = '고급'
                 state.condition = "choose_topic"
                 st.experimental_rerun()
 
-        fourth = c6.form("자유주제")
+        fourth = c7.form("자유주제")
         with fourth:
             for _ in range(3):
                 st.write('')
@@ -84,6 +86,8 @@ def choose_difficulty():
 
 def choose_topic(difficulty):
     st.set_page_config(page_title = "Topic",layout="wide", initial_sidebar_state="collapsed")
+    st.image('templates/user.png', width=200)
+
     
     if state.condition != 'choose_topic':
         state.prev_condition = state.condition
@@ -139,7 +143,8 @@ def choose_topic(difficulty):
 
 def choose_type():
     st.set_page_config(page_title = "Type",layout="wide", initial_sidebar_state="collapsed")
-    
+    st.image('templates/user.png', width=200)
+
     if state.condition != 'choose_type':
         state.prev_conditon = state.condition
         return state.condition
@@ -159,14 +164,14 @@ def choose_type():
             cc1, cc2, cc3 = st.columns([0.2, 1, 0.2])
             m = st.markdown("""
                 <style>
+                div.stButton {
+                    text-align: center;
+                }
                 div.stButton > button:first-child {
                     background-color: rgb(254, 174, 0);
                     color:White;
                     height:auto;
-                    padding-top:10px;
-                    padding-bottom:10px;
-                    padding-right:100px;
-                    padding-left:100px;
+                    
                 }
                 </style>""", unsafe_allow_html=True)
 
