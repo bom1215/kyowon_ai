@@ -53,7 +53,9 @@ def learning(difficulty, topic, type):
         return True
     
     else:
+        st.image('templates/user.png', width=150)
         st.markdown(f"<h1 style='text-align: center; color: gray;'>AI야어여</h1>", unsafe_allow_html=True)
+    
         for _ in range(3):
             st.write('')
         
