@@ -244,7 +244,7 @@ def init_sent_quiz(problems):
     for word in problems:
         sent = make_sentence_subject(word)
         option, _ = make_blank_subject(sent, word)
-        sent.replace(word, '{}')
+        sent = sent.replace(word, '{}')
         sents.append(sent)
         options.append(option)
     return sents, options

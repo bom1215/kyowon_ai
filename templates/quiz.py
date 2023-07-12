@@ -1,7 +1,6 @@
 import streamlit as st
 from streamlit import session_state as state
 import time
-import main
 import pandas as pd
 
 base = pd.read_csv("data/학교_초급.csv")
@@ -16,11 +15,11 @@ def set_quiz():
     if 'correct_answers' not in state:
         state.correct_answers = 0
 
-    if 'quiz_len' not in state:
-        state.quiz_len = 10
-    
     if 'replay' not in state:
         state.replay = False
+
+    if 'quiz_len' not in state:
+        state.quiz_len = 10
 
     if state.condition == "quiz_score":
         quiz_score(state.correct_answers, state.quiz_len)
@@ -31,12 +30,12 @@ def word_quiz():
 
     if 'answer' not in state:
         state.answer = 0
-    state.quiz_len = len(base)
+    state.quiz_len = len(problems)
 
     if state.quiz_counter == state.quiz_len:
         state.prev_condition = state.condition
         state.condition = "quiz_score"
-        st.experimental_rerun()
+        set_quiz()
 
     else:
         st.title("단어 퀴즈")
@@ -67,37 +66,33 @@ def word_quiz():
                 st.experimental_rerun()
 
 def sent_learn():
-    st.set_page_config(page_title="문장 퀴즈 : 빈칸 채우기", page_icon = "❓")
+    st.set_page_config(page_title="문장 학습", page_icon = "❓")
+    state.quiz_len = len(problems)
     if "answer_list" not in state:
         state.answer_list = ["______"] * 10
 
-    state.quiz_len = len(blank)
-    quiz = blank
-    
-    if state.replay:
-        state.quiz_len = len(replay)
-        quiz = replay
-    if state.quiz_counter == state.quiz_len:        
+    if state.quiz_counter == state.quiz_len:
         for i in range(state.quiz_len):
-            answer = eval(quiz.iloc[i]['options'])[quiz['answer'].iloc[i]]
+            answer = problems[i]
             if state.answer_list[i] == answer:
                 state.correct_answers += 1
         del state.answer_list
         state.prev_condition = state.condition
         state.condition = "quiz_score"
-        st.experimental_rerun()
+        quiz_score(state.correct_answers, state.quiz_len)
 
     else:
         st.title("문장 퀴즈")
         st.subheader(f"{state.quiz_counter + 1}번 문제")
 
-        quiz = quiz.iloc[state.quiz_counter]
         c1, c2, c3 = st.columns([1, 8, 1])
         image_url = quiz['sen_img']
         c2.image(image_url, width=400)
 
         container1 = c2.container()
-        sent = quiz['question']
+
+        sent = sents[state.quiz_counter]
+        option = options[state.quiz_counter]
         #answer = eval(quiz['options'])[blank['answer'].iloc[state.quiz_counter]]
         sent = "f'"+sent.replace('{}', ':blue[**{state.answer_list[state.quiz_counter]}**]')+"'"
         st.markdown("""
@@ -125,7 +120,7 @@ def sent_learn():
                     state.answer_list[state.quiz_counter] = state.blank
                     st.experimental_rerun()
 
-        co1, co2, co3, co4 = st.columns([1,1,1,1])
+        co1, co2, co3, co4 = st.columns([0.2, 1, 1, 0.2])
         if state.quiz_counter == 9:
             if co1.button("이전", disabled = (state.quiz_counter < 1)):
                 state.quiz_counter -= 1
@@ -150,10 +145,11 @@ def sent_quiz():
 
     quiz = order
     state.quiz_len = len(quiz)
+    st.set_page_config(page_title="문장 만들기", page_icon = "❓")
     if state.quiz_counter == state.quiz_len:
         state.prev_condition = state.condition
         state.condition = "quiz_score"
-        st.experimental_rerun()
+        set_quiz()
 
     else:
         st.title("문장 퀴즈")
@@ -208,6 +204,7 @@ def sent_quiz():
 
 
 
+
 def quiz_score(score, length):
     st.set_page_config(page_title="결과", page_icon = "🏆", layout="wide")
     
@@ -249,9 +246,9 @@ def quiz_score(score, length):
         if state.prev_condition == "word_quiz":
             quiz = base['word'].to_list()
         elif state.replay:
-            quiz = replay['word'].to_list()
+            quiz = problems
         elif state.prev_condition == "sent_learn":
-            quiz = blank['word'].to_list()
+            quiz = problems
 
         title.write(" ")
         text.write(" ")
@@ -260,7 +257,9 @@ def quiz_score(score, length):
             text.write(f"{a}")
 
     else:
+        import main
         main.main()
+
 
 def loading():
     st.set_page_config(page_title = "로딩 중", layout="wide")
@@ -284,6 +283,7 @@ def loading():
         state.prev_condition = state.condition
         state.replay = True
         st.experimental_rerun()
-    
+
+
 if __name__ == "__main__":
     word_quiz()
