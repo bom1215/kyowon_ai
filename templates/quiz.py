@@ -37,7 +37,7 @@ def word_quiz():
     if state.quiz_counter == state.quiz_len:
         state.prev_condition = state.condition
         state.condition = "quiz_score"
-        set_quiz()
+        st.experimental_rerun()
 
     else:
         st.title("단어 퀴즈")
@@ -83,7 +83,7 @@ def sent_learn():
         del state.answer_list
         state.prev_condition = state.condition
         state.condition = "quiz_score"
-        quiz_score(state.correct_answers, state.quiz_len)
+        st.experimental_rerun()
 
     else:
         st.title("문장 퀴즈")
@@ -155,6 +155,7 @@ def sent_quiz():
 
 
 def quiz_score(score, length):
+    st.set_page_config(page_title="학습 결과", page_icon = "😊")
     if state.condition == "quiz_score":
         st.title("학습 결과")
         st.markdown(f"<h4 style='text-align: center; color: black;'></h1>", unsafe_allow_html=True)
@@ -182,12 +183,7 @@ def quiz_score(score, length):
 
         col1.title(f':{color}[{score * 10}] / {length * 10} 점')
 
-        if state.prev_condition == "word_quiz":
-            quiz = problems
-        elif state.replay:
-            quiz = problems
-        elif state.prev_condition == "sent_learn":
-            quiz = problems
+        quiz = problems
 
         title.write(" ")
         text.write(" ")
@@ -195,8 +191,7 @@ def quiz_score(score, length):
             title.write(f"{i + 1}번")
             text.write(f"{a}")
     else:
-        import main
-        main.main()
+        st.experimental_rerun()
 
 
 def loading():
@@ -213,9 +208,9 @@ def loading():
                     </style>
                     """,
                         unsafe_allow_html=True,)
-    time.sleep(5)
 
     c1, c2, c3 = st.columns(3)
+    time.sleep(5)
     if c2.button("퀴즈 생성 완료"):
         state.condition = state.prev_condition
         state.prev_condition = state.condition

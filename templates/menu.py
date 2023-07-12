@@ -15,7 +15,7 @@ TOPIC = {
 
 def choose_difficulty():
     st.set_page_config(page_title = "난이도 선택", layout="wide", initial_sidebar_state="collapsed")
-    st.image('templates/user.png', width=200)
+    st.image('templates/user.png', width=150)
 
 
     if state.condition != 'choose_difficulty':
@@ -86,7 +86,7 @@ def choose_difficulty():
 
 def choose_topic(difficulty):
     st.set_page_config(page_title = "Topic",layout="wide", initial_sidebar_state="collapsed")
-    st.image('templates/user.png', width=200)
+    st.image('templates/user.png', width=150)
 
     
     if state.condition != 'choose_topic':
@@ -143,7 +143,7 @@ def choose_topic(difficulty):
 
 def choose_type():
     st.set_page_config(page_title = "Type",layout="wide", initial_sidebar_state="collapsed")
-    st.image('templates/user.png', width=200)
+    st.image('templates/user.png', width=150)
 
     if state.condition != 'choose_type':
         state.prev_conditon = state.condition
@@ -247,11 +247,11 @@ def choose_type():
                 state.type = '문장'
                 state.condition = "sent_learn"
                 if state.difficulty == '초급' and state.topic == '학교생활':
-                    quiz_code.problems = random.sample(quiz_code.words, 3)
+                    quiz_code.problems = random.sample(quiz_code.words, 10)
                     quiz_code.sents, quiz_code.options = function.init_sent_quiz(quiz_code.problems)
                     quiz_code.images = []
                     for sent, word in zip(quiz_code.sents, quiz_code.problems):
-                        path = create_image(sent.replace('{}',word))
+                        path = create_image(sent)
                         quiz_code.images.append(path)
                         # quiz_code.images.append('./templates/ice-bear.jpg')
                     quiz_code.wrong = []
