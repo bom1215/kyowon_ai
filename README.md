@@ -3,7 +3,7 @@
 [한국어](#한국어)
 
 ### ENG
-# Korean Language Dducation App, AI야어여
+# Korean Language Education App, AI야어여
 This is a Korean language education app utilizing generative AI models (DALL-E, Bard, ChatGPT) to generate supplementary learning materials for words and sentences.
 
 ## Getting Started
