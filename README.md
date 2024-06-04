@@ -1,5 +1,26 @@
 # AI야어여
+[ENG](#ENG)   
+[한국어](#한국어)
 
+### ENG
+# Korean Language Education App, AI야어여
+This is a Korean language education app utilizing generative AI models (DALL-E, Bard, ChatGPT) to generate supplementary learning materials for words and sentences.
+
+## Getting Started
+
+To use this project, follow these steps:
+
+### Run the app:
+```
+streamlit run templates/main.py
+```
+
+## App Preview
+
+Here is a preview of our app:   
+![Alt text](/demo.gif)
+
+### 한국어
 ### 서비스 소개
 생성형 AI를 이용한 이미지와 문장으로 학습하는 한국어 교육 프로그램
 
